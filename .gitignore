@@ -1,13 +1,75 @@
+# Secrets & environment
 .env
+.env.*
+!.env.example
+
+# Database files
 *.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Data directories (raw/processed data, not source code)
 data/raw/
 data/processed/
+
+# Python
 __pycache__/
-*.pyc
-.pytest_cache/
-*.egg-info/
-dist/
-build/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
 .venv/
 venv/
+env/
+ENV/
+
+# Build artifacts
+*.egg-info/
+*.egg
+dist/
+build/
+wheels/
+sdist/
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.lcov
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+.pyre/
+
+# Ruff
+.ruff_cache/
+
+# Jupyter
 .ipynb_checkpoints/
+*.ipynb
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
