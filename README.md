@@ -1,20 +1,24 @@
 # FluSight Edge
 
-A quantitative trading system that exploits informational lags in CDC epidemiological data to trade flu hospitalization bracket markets on [Polymarket](https://polymarket.com/). Built as a full-stack research-to-execution pipeline: signal ingestion, statistical modeling, position sizing, and operational monitoring — all in Python.
+A multi-signal **epidemiological nowcasting research pipeline** for U.S. influenza hospitalization rates, built to evaluate a prediction-market thesis on [Polymarket](https://polymarket.com/). Phase 1 ships the data backbone in Python — signal ingestion, a FluSurv-NET backfill-revision model, and a Polymarket market scraper — with **177 passing tests**.
+
+> **Status: research-stage infrastructure, not a live trading bot.** The execution layer (position sizing, order placement, edge monitoring) is fully specified in the [model design spec](docs/research/model_design_spec.md) but **not yet built**. See [Current Status](#current-status) for the exact Phase 1 / Phase 2 split.
 
 ---
 
-## The Edge
+## The Thesis
 
 Polymarket runs weekly prediction markets on U.S. influenza hospitalization rates (e.g., "Will the cumulative rate be 60–70 per 100K by end of season?"). These markets resolve on **final** CDC FluSurv-NET data, but early-season prices reflect **preliminary** numbers that are systematically revised upward 15–30% as lagging hospitals report over subsequent weeks.
 
-FluSight Edge exploits this by:
+The full strategy has five components. Phase 1 builds the data and modeling foundation (1–2); the downstream trading mechanics (3–5) are designed in the math spec but not yet implemented:
 
-1. **Backfill arbitrage** — Modeling FluSurv-NET revision patterns to predict final rates from preliminary reports
-2. **Multi-signal fusion** — Combining 7 leading indicators that move 1–3 weeks ahead of official hospitalization counts
-3. **Calibrated bracket probabilities** — Converting point estimates into properly calibrated probability distributions over market brackets
-4. **Fractional Kelly sizing** — Position sizing at 0.20x Kelly to account for model uncertainty
-5. **SPRT monitoring** — Sequential probability ratio test to detect edge degradation and trigger kill switches
+| # | Component | What it does | Status |
+|---|-----------|--------------|--------|
+| 1 | **Backfill modeling** | Model FluSurv-NET revision patterns to predict final rates from preliminary reports | **Built** |
+| 2 | **Multi-signal ingestion** | Pull leading indicators that move 1–3 weeks ahead of official hospitalization counts | **Built** (3 of 7 sources) |
+| 3 | **Calibrated bracket probabilities** | Convert point estimates into calibrated probability distributions over market brackets | Designed (Phase 2) |
+| 4 | **Fractional Kelly sizing** | Size positions at 0.20× Kelly to account for model uncertainty | Designed (Phase 2) |
+| 5 | **SPRT monitoring** | Sequential probability ratio test to detect edge degradation and trigger kill switches | Designed (Phase 2) |
 
 ---
 
@@ -76,6 +80,8 @@ CDC NWSS / Delphi APIs
         ↓
   monitoring/pnl + SPRT    ← P&L tracking, edge monitoring
 ```
+
+Phase 1 implements everything down through the SQLite `signals` table and `models/backfill.train()`. The lower half — `nowcast.predict()`, calibration, Kelly sizing, the CLOB executor, and SPRT monitoring — is the documented Phase 2 design and is **not yet built**.
 
 ---
 
@@ -182,7 +188,7 @@ INITIAL_CAPITAL = 5000          # Starting bankroll (USDC)
 
 ## Current Status
 
-**Phase 1 complete** — all data pipelines, the backfill model, and market scraper are production-ready with full test coverage.
+**Phase 1 complete** — the data pipelines, the backfill-revision model, and the Polymarket market scraper are implemented and fully tested (177 tests). No live or paper trading is wired up yet.
 
 | Component | Status |
 |-----------|--------|
@@ -222,7 +228,9 @@ INITIAL_CAPITAL = 5000          # Starting bankroll (USDC)
 
 ## Stack
 
-Python 3.11 · PyTorch · scikit-learn · SQLite · httpx · pytest · CDC NWSS API · Delphi Epidata API · Polymarket CLOB API
+**Phase 1 (built):** Python 3.11 · httpx · SQLite · pytest · epiweeks · Python stdlib `statistics`/`math` (backfill model) · CDC NWSS SODA API · Delphi Epidata API · Polymarket Gamma/CLOB API
+
+**Phase 2 (planned):** scikit-learn · scipy · py-clob-client — for the nowcast ensemble, EMOS calibration, and CLOB order execution
 
 ---
 
