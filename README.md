@@ -87,16 +87,17 @@ Phase 1 implements everything down through the SQLite `signals` table and `model
 
 ## Database Schema
 
-SQLite with WAL mode. Six tables:
+SQLite with WAL mode. Seven tables are defined in `schema.sql`; Phase 1 actively writes to four of them. The remaining three back the unbuilt Phase 2 execution layer and currently exist as schema only.
 
-| Table | Purpose |
-|-------|---------|
-| `signals` | Raw signal observations, one row per (signal, epiweek, geography) |
-| `revisions` | FluSurv-NET revision history — preliminary rates at each lag |
-| `predictions` | Model bracket probabilities per epiweek |
-| `markets` | Polymarket market metadata and resolution state |
-| `market_prices` | Order book snapshots (bid/ask/last/volume) |
-| `trades` | Full audit log of all trades (paper and live) |
+| Table | Purpose | Status |
+|-------|---------|--------|
+| `signals` | Raw signal observations, one row per (signal, epiweek, geography) | Populated |
+| `revisions` | FluSurv-NET revision history — preliminary rates at each lag | Populated |
+| `markets` | Polymarket market metadata and resolution state | Populated |
+| `market_prices` | Order book snapshots (bid/ask/last/volume) | Populated |
+| `predictions` | Model bracket probabilities per epiweek | Phase 2 — schema only |
+| `trades` | Trade audit log (paper and live) | Phase 2 — schema only |
+| `pnl` | Per-position P&L tracking | Phase 2 — schema only |
 
 ---
 
